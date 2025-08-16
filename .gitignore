@@ -1,0 +1,42 @@
+# Dependencias
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Temp files
+*.tmp
+*.temp
+.cache/
+
+# API keys y configuración sensible
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+config/secrets.json
