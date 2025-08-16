@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  portal-web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+    depends_on:
+      - database
+
+  database:
+    image: sqlite:latest
+    volumes:
+      - ./data/database:/data
+    environment:
+      - SQLITE_DATABASE=portal.db
+
+  # Servicio opcional para Jupyter notebooks
+  jupyter:
+    build: .
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+
+volumes:
+  database_data:
+  logs_data:

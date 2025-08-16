@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "name": "Dataset Mini para RAG Básico",
+    "description": "Colección de fragmentos sobre Inteligencia Artificial para desarrolladores",
+    "version": "1.0.0",
+    "total_documents": 10,
+    "created_at": "2025-08-16"
+  },
+  "documents": [
+  {
+    "id": "doc_001",
+    "title": "¿Qué es un Agente de IA?",
+    "content": "Un agente de IA es un sistema que puede percibir su entorno, tomar decisiones y actuar de forma autónoma para alcanzar objetivos específicos. A diferencia de un chatbot tradicional que solo responde preguntas, un agente puede planificar, usar herramientas externas y adaptarse a diferentes situaciones.",
+    "source": "fundamentos-ia.md#L1-L5",
+    "category": "conceptos",
+    "tags": ["agentes", "autonomia", "planificacion"]
+  },
+  {
+    "id": "doc_002", 
+    "title": "Diferencias entre Chat y Agente",
+    "content": "Los chatbots tradicionales funcionan con un patrón simple: reciben entrada, procesan y devuelven salida. Los agentes de IA, en cambio, siguen un ciclo más complejo: observan, planifican, actúan y evalúan. Pueden usar múltiples herramientas, mantener estado entre interacciones y tomar decisiones basadas en objetivos a largo plazo.",
+    "source": "comparacion-sistemas.md#L15-L22",
+    "category": "conceptos",
+    "tags": ["chatbot", "agente", "diferencias", "arquitectura"]
+  },
+  {
+    "id": "doc_003",
+    "title": "Tool Calling Seguro",
+    "content": "El tool calling permite que los agentes interactúen con sistemas externos. Para hacerlo de forma segura, es esencial: 1) Validar todas las entradas, 2) Limitar las herramientas disponibles, 3) Implementar timeouts, 4) Registrar todas las llamadas, 5) Aplicar principio de menor privilegio.",
+    "source": "seguridad-agentes.md#L8-L15",
+    "category": "seguridad",
+    "tags": ["tool-calling", "seguridad", "validacion"]
+  },
+  {
+    "id": "doc_004",
+    "title": "RAG: Retrieval-Augmented Generation",
+    "content": "RAG combina la recuperación de información con la generación de texto. El proceso tiene tres fases: 1) Recuperar documentos relevantes de una base de conocimiento, 2) Aumentar el prompt con el contexto recuperado, 3) Generar una respuesta basada en la información encontrada. Esto permite respuestas más precisas y actualizadas.",
+    "source": "rag-fundamentos.md#L1-L8",
+    "category": "rag",
+    "tags": ["rag", "retrieval", "generation", "contexto"]
+  },
+  {
+    "id": "doc_005",
+    "title": "Citas Canónicas en RAG",
+    "content": "Las citas canónicas siguen el formato uri#Lx-Ly donde 'uri' es la fuente del documento, 'L' indica línea, 'x' es la línea inicial e 'y' la línea final. Ejemplo: 'manual.pdf#L45-L52' referencia las líneas 45 a 52 del archivo manual.pdf. Esto permite verificabilidad y trazabilidad de las fuentes.",
+    "source": "citas-canonicas.md#L12-L18",
+    "category": "rag",
+    "tags": ["citas", "trazabilidad", "verificacion", "fuentes"]
+  },
+  {
+    "id": "doc_006",
+    "title": "Métricas de Evaluación",
+    "content": "Para evaluar sistemas de IA es crucial medir: Precisión (relevancia de respuestas), Recall (cobertura de información), Latencia (tiempo de respuesta), Coste (tokens consumidos), y Satisfacción del usuario. Los 'quick evals' son pruebas automatizadas que validan estos aspectos de forma continua.",
+    "source": "metricas-evaluacion.md#L5-L12",
+    "category": "evaluacion",
+    "tags": ["metricas", "precision", "recall", "latencia", "coste"]
+  },
+  {
+    "id": "doc_007",
+    "title": "Patrón Planner-Executor-Critic",
+    "content": "La arquitectura PEC divide la responsabilidad del agente en tres componentes: Planner (genera plan de acción), Executor (ejecuta las acciones planificadas), y Critic (evalúa resultados y sugiere mejoras). Esta separación mejora la modularidad, testabilidad y capacidad de debugging del sistema.",
+    "source": "patron-pec.md#L20-L28",
+    "category": "arquitectura",
+    "tags": ["pec", "planner", "executor", "critic", "modularidad"]
+  },
+  {
+    "id": "doc_008",
+    "title": "JSON Estructurado para Agentes",
+    "content": "Los agentes deben generar salidas en formato JSON válido para facilitar el procesamiento automatizado. Un schema bien definido incluye: 'action' (acción a realizar), 'parameters' (parámetros necesarios), 'reasoning' (justificación), y 'confidence' (nivel de confianza). Esto permite integración con otros sistemas.",
+    "source": "json-estructurado.md#L3-L10",
+    "category": "formato",
+    "tags": ["json", "schema", "estructurado", "integracion"]
+  },
+  {
+    "id": "doc_009",
+    "title": "BM25 para Búsqueda",
+    "content": "BM25 (Best Matching 25) es un algoritmo de ranking para recuperación de información. Calcula relevancia basada en frecuencia de términos (TF) y frecuencia inversa de documentos (IDF), con normalización por longitud. Es efectivo para RAG básico y computacionalmente eficiente comparado con embeddings densos.",
+    "source": "algoritmos-busqueda.md#L15-L22",
+    "category": "algoritmos",
+    "tags": ["bm25", "ranking", "tf-idf", "busqueda"]
+  },
+  {
+    "id": "doc_010",
+    "title": "MMR: Maximal Marginal Relevance",
+    "content": "MMR es una técnica de re-ranking que balancea relevancia y diversidad en los resultados de búsqueda. La fórmula MMR = λ * relevancia - (1-λ) * redundancia permite controlar el trade-off. Un λ alto prioriza relevancia, λ bajo prioriza diversidad. Típicamente λ = 0.7 funciona bien.",
+    "source": "mmr-reranking.md#L8-L15",
+    "category": "algoritmos", 
+    "tags": ["mmr", "reranking", "diversidad", "relevancia"]
+    }
+  ]
+}

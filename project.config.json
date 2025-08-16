@@ -1,0 +1,94 @@
+{
+  "name": "Portal 1: Fundamentos de IA para Desarrolladores",
+  "version": "1.0.0",
+  "description": "Curso de capacitación en IA para desarrolladores sin experiencia previa en agentes o RAG",
+  "author": "Mauricio Acuña",
+  "language": "es",
+  "modules": [
+    {
+      "id": "module-a",
+      "name": "Conceptos Esenciales",
+      "description": "Agentes vs chat, JSON estructurado, seguridad mínima",
+      "duration": "2-3 horas",
+      "objectives": [
+        "Diferenciar entre chatbots tradicionales y agentes de IA",
+        "Generar salidas estructuradas en JSON válido",
+        "Aplicar reglas básicas de seguridad"
+      ],
+      "contentPath": "content/modules/module-a-conceptos",
+      "labPath": "labs/module-a"
+    },
+    {
+      "id": "module-b",
+      "name": "Primer Mini-Agente",
+      "description": "Implementación de patrón Planner→Executor→Critic simple",
+      "duration": "3-4 horas",
+      "objectives": [
+        "Crear un agente básico con arquitectura PEC",
+        "Implementar tool calling seguro",
+        "Manejar errores y validaciones"
+      ],
+      "contentPath": "content/modules/module-b-mini-agente",
+      "labPath": "labs/module-b"
+    },
+    {
+      "id": "module-c",
+      "name": "RAG Básico con Citas",
+      "description": "Retrieval-Augmented Generation con citas canónicas",
+      "duration": "3-4 horas",
+      "objectives": [
+        "Implementar RAG básico con BM25/TF-IDF",
+        "Generar citas canónicas uri#Lx-Ly",
+        "Aplicar técnicas de re-ranking (MMR)"
+      ],
+      "contentPath": "content/modules/module-c-rag-basico",
+      "labPath": "labs/module-c"
+    },
+    {
+      "id": "module-d",
+      "name": "Métricas y Evaluación",
+      "description": "Calidad, coste, latencia y tests mínimos",
+      "duration": "2-3 horas",
+      "objectives": [
+        "Implementar quick evals básicos",
+        "Medir coste de tokens y latencia",
+        "Crear gates de evaluación"
+      ],
+      "contentPath": "content/modules/module-d-metricas",
+      "labPath": "labs/module-d"
+    },
+    {
+      "id": "module-e",
+      "name": "Capstone",
+      "description": "Proyecto final integrador",
+      "duration": "4-6 horas",
+      "objectives": [
+        "Integrar agente + RAG en proyecto completo",
+        "Documentar y presentar solución",
+        "Preparar repositorio para entrevistas"
+      ],
+      "contentPath": "content/modules/module-e-capstone",
+      "labPath": "labs/capstone"
+    }
+  ],
+  "kpis": {
+    "completion_rate_target": 65,
+    "capstone_delivery_target": 40,
+    "nps_target": 8,
+    "eval_precision_target": 70
+  },
+  "technologies": [
+    "Python",
+    "OpenAI API",
+    "FastAPI",
+    "SQLite",
+    "Docker",
+    "pytest"
+  ],
+  "prerequisites": [
+    "Conocimientos básicos de Python",
+    "Familiaridad con APIs REST",
+    "Git y control de versiones",
+    "Docker básico"
+  ]
+}

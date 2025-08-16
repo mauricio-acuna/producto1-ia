@@ -1,0 +1,70 @@
+# Configuración de Seguridad Mínima para Agentes de IA
+# safety.min.yaml - Template base para estudiantes
+
+# Reglas de validación de entrada
+input_validation:
+  max_length: 1000
+  allowed_characters: "alphanumeric_extended"  # a-z, A-Z, 0-9, espacios, puntuación básica
+  blocked_patterns:
+    - "eval\\("
+    - "exec\\("
+    - "__import__"
+    - "subprocess"
+    - "os\\."
+    - "system\\("
+    - "shell=True"
+  
+# Control de herramientas (tool calling)
+tool_safety:
+  allowed_tools:
+    - "search_documents"
+    - "get_weather"
+    - "calculate"
+    - "format_response"
+  
+  blocked_tools:
+    - "execute_code"
+    - "file_system_access"
+    - "network_request"
+    - "database_write"
+  
+  parameter_validation:
+    enabled: true
+    max_param_length: 200
+    sanitize_inputs: true
+
+# Límites de recursos
+resource_limits:
+  max_tokens_per_request: 4000
+  max_requests_per_minute: 10
+  max_concurrent_requests: 3
+  timeout_seconds: 30
+
+# Filtros de salida
+output_filtering:
+  block_personal_info: true
+  block_code_execution: true
+  max_response_length: 2000
+  
+  content_filters:
+    - "no_credentials"
+    - "no_system_prompts"
+    - "no_internal_thoughts"
+
+# Logging y monitoreo
+security_logging:
+  log_blocked_requests: true
+  log_tool_usage: true
+  log_token_usage: true
+  alert_on_suspicious_patterns: true
+
+# Configuración por ambiente
+environments:
+  development:
+    strict_mode: false
+    debug_logging: true
+  
+  production:
+    strict_mode: true
+    debug_logging: false
+    additional_validation: true

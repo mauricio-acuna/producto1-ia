@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent Plan Specification",
+  "description": "Plantilla básica para definir planes de agentes de IA",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Identificador único del plan"
+    },
+    "goal": {
+      "type": "string",
+      "description": "Objetivo principal que debe cumplir el agente",
+      "maxLength": 200
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "user_input": {
+          "type": "string",
+          "description": "Entrada original del usuario"
+        },
+        "available_tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Lista de herramientas disponibles para el agente"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Restricciones o limitaciones del plan"
+        }
+      },
+      "required": ["user_input", "available_tools"]
+    },
+    "steps": {
+      "type": "array",
+      "description": "Secuencia de pasos para ejecutar el plan",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_id": {
+            "type": "integer",
+            "description": "Número de orden del paso"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["analyze", "search", "transform", "validate", "respond"],
+            "description": "Tipo de acción a realizar"
+          },
+          "tool": {
+            "type": "string",
+            "description": "Herramienta específica a utilizar"
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Parámetros para la herramienta"
+          },
+          "expected_output": {
+            "type": "string",
+            "description": "Tipo de salida esperada"
+          },
+          "validation_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Criterios para validar el éxito del paso"
+          }
+        },
+        "required": ["step_id", "action", "tool"]
+      },
+      "minItems": 1,
+      "maxItems": 10
+    },
+    "success_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Criterios para considerar el plan exitoso"
+    },
+    "fallback_strategy": {
+      "type": "object",
+      "properties": {
+        "trigger_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "alternative_plan": {
+          "type": "string",
+          "description": "Plan alternativo en caso de fallo"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "estimated_duration": {
+          "type": "number",
+          "description": "Duración estimada en segundos"
+        },
+        "complexity_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["plan_id", "goal", "context", "steps", "success_criteria"],
+  "examples": [
+    {
+      "plan_id": "search_and_summarize_001",
+      "goal": "Buscar información sobre un tema y generar un resumen estructurado",
+      "context": {
+        "user_input": "Quiero información sobre machine learning",
+        "available_tools": ["search_documents", "summarize_text", "format_response"],
+        "constraints": ["máximo 500 palabras", "incluir fuentes"]
+      },
+      "steps": [
+        {
+          "step_id": 1,
+          "action": "search",
+          "tool": "search_documents",
+          "parameters": {
+            "query": "machine learning fundamentals",
+            "max_results": 5
+          },
+          "expected_output": "lista de documentos relevantes",
+          "validation_criteria": ["al menos 3 documentos encontrados"]
+        },
+        {
+          "step_id": 2,
+          "action": "transform",
+          "tool": "summarize_text",
+          "parameters": {
+            "max_length": 400,
+            "include_sources": true
+          },
+          "expected_output": "resumen estructurado",
+          "validation_criteria": ["longitud <= 500 palabras", "fuentes incluidas"]
+        },
+        {
+          "step_id": 3,
+          "action": "respond",
+          "tool": "format_response",
+          "parameters": {
+            "format": "markdown",
+            "include_metadata": true
+          },
+          "expected_output": "respuesta formateada",
+          "validation_criteria": ["formato markdown válido"]
+        }
+      ],
+      "success_criteria": [
+        "usuario recibe resumen completo",
+        "fuentes citadas correctamente",
+        "tiempo de respuesta < 30 segundos"
+      ],
+      "metadata": {
+        "complexity_level": "medium",
+        "estimated_duration": 25,
+        "tags": ["search", "summarization", "information_retrieval"]
+      }
+    }
+  ]
+}
