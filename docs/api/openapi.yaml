@@ -1,0 +1,1483 @@
+# OpenAPI Specification 3.1.0
+
+openapi: 3.1.0
+info:
+  title: AI Agent Framework API
+  description: |
+    Enterprise-grade AI Agent Framework API for building, deploying, and managing AI agents.
+    
+    ## Features
+    - **PEC Architecture**: Plan-Execute-Critique pattern for reliable agent execution
+    - **Multi-Agent Coordination**: Orchestrate complex workflows across specialized agents
+    - **RAG with Citations**: Retrieval-augmented generation with source attribution
+    - **Security-First Design**: Zero-trust architecture with comprehensive audit trails
+    - **Enterprise Compliance**: SOC2, GDPR, HIPAA compliance built-in
+    
+    ## Authentication
+    All endpoints require Bearer token authentication using your API key.
+    
+    ## Rate Limits
+    - Standard tier: 1000 requests/minute
+    - Enterprise tier: 10000 requests/minute
+    - Burst limits available for execution endpoints
+    
+    ## Support
+    - Documentation: https://docs.ai-agent-framework.com
+    - Support: support@ai-agent-framework.com
+    - Status: https://status.ai-agent-framework.com
+    
+  version: 1.4.2
+  contact:
+    name: AI Agent Framework Support
+    email: support@ai-agent-framework.com
+    url: https://ai-agent-framework.com/support
+  license:
+    name: Enterprise License
+    url: https://ai-agent-framework.com/license
+  termsOfService: https://ai-agent-framework.com/terms
+
+servers:
+  - url: https://api.ai-agent-framework.com/v1
+    description: Production server
+  - url: https://staging-api.ai-agent-framework.com/v1
+    description: Staging server
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Agent Management
+  /agents:
+    get:
+      tags: [Agent Management]
+      summary: List agents
+      description: Retrieve all agents for your organization with filtering and pagination
+      parameters:
+        - name: type
+          in: query
+          description: Filter by agent type
+          schema:
+            type: string
+            enum: [analysis, integration, knowledge, workflow, security]
+        - name: status
+          in: query
+          description: Filter by agent status
+          schema:
+            type: string
+            enum: [active, inactive, error]
+            default: active
+        - name: limit
+          in: query
+          description: Number of results to return (1-100)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: cursor
+          in: query
+          description: Pagination cursor for next page
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+    post:
+      tags: [Agent Management]
+      summary: Create agent
+      description: Create a new AI agent with specified configuration and capabilities
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+            examples:
+              document_processor:
+                summary: Document processing agent
+                value:
+                  name: "document-processor"
+                  type: "analysis"
+                  description: "Processes and analyzes documents"
+                  capabilities: ["document_parsing", "text_extraction", "sentiment_analysis"]
+                  config:
+                    max_document_size: "10MB"
+                    supported_formats: ["pdf", "docx", "txt"]
+                  security_policy:
+                    data_classification: "internal"
+                    retention_days: 90
+              api_integrator:
+                summary: API integration agent
+                value:
+                  name: "api-integrator"
+                  type: "integration"
+                  description: "Handles external API integrations"
+                  capabilities: ["rest_api_calls", "data_transformation", "authentication_handling"]
+                  config:
+                    rate_limit_per_minute: 100
+                    timeout_seconds: 30
+      responses:
+        '201':
+          description: Agent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /agents/{agent_id}:
+    get:
+      tags: [Agent Management]
+      summary: Get agent details
+      description: Retrieve detailed information about a specific agent
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          description: Unique identifier for the agent
+          schema:
+            type: string
+            pattern: '^agent_[a-zA-Z0-9]{12}$'
+      responses:
+        '200':
+          description: Agent details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Agent Management]
+      summary: Update agent
+      description: Update agent configuration and capabilities
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAgentRequest'
+      responses:
+        '200':
+          description: Agent updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Agent'
+
+    delete:
+      tags: [Agent Management]
+      summary: Delete agent
+      description: Delete an agent and all associated data
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Agent deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /agents/{agent_id}/execute:
+    post:
+      tags: [Agent Execution]
+      summary: Execute agent workflow
+      description: Execute a workflow using the specified agent with input data
+      parameters:
+        - name: agent_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteWorkflowRequest'
+            examples:
+              document_analysis:
+                summary: Document analysis workflow
+                value:
+                  workflow_id: "document-analysis-v1"
+                  input_data:
+                    document_url: "https://example.com/contract.pdf"
+                    analysis_type: "legal_review"
+                  options:
+                    async: true
+                    timeout_seconds: 300
+              data_processing:
+                summary: Data processing workflow
+                value:
+                  input_data:
+                    dataset_url: "https://data.example.com/sales.csv"
+                    operations: ["clean", "analyze", "visualize"]
+                  options:
+                    async: false
+      responses:
+        '200':
+          description: Workflow executed successfully (synchronous)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecutionResult'
+        '202':
+          description: Workflow execution started (asynchronous)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncExecutionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  # Workflow Management
+  /workflows:
+    get:
+      tags: [Workflow Management]
+      summary: List workflows
+      description: Retrieve all available workflows with filtering options
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: version
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowListResponse'
+
+    post:
+      tags: [Workflow Management]
+      summary: Create workflow
+      description: Define a new multi-step workflow for agent execution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkflowRequest'
+      responses:
+        '201':
+          description: Workflow created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+
+  /workflows/{workflow_id}/execute:
+    post:
+      tags: [Workflow Management]
+      summary: Execute workflow
+      description: Execute a specific workflow with provided input data
+      parameters:
+        - name: workflow_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteWorkflowRequest'
+      responses:
+        '200':
+          description: Workflow executed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecutionResult'
+        '202':
+          description: Workflow execution started (async)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsyncExecutionResponse'
+
+  # Tool Registry
+  /tools:
+    get:
+      tags: [Tool Registry]
+      summary: List available tools
+      description: Retrieve all tools available for agent use
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: agent_type
+          in: query
+          description: Filter tools available for specific agent type
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of available tools
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolListResponse'
+
+    post:
+      tags: [Tool Registry]
+      summary: Register tool
+      description: Register a new tool for use by agents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterToolRequest'
+      responses:
+        '201':
+          description: Tool registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tool'
+
+  /tools/{tool_id}:
+    get:
+      tags: [Tool Registry]
+      summary: Get tool details
+      parameters:
+        - name: tool_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tool details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tool'
+
+    delete:
+      tags: [Tool Registry]
+      summary: Unregister tool
+      parameters:
+        - name: tool_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Tool unregistered successfully
+
+  # Knowledge Base
+  /knowledge/upload:
+    post:
+      tags: [Knowledge Base]
+      summary: Upload document
+      description: Upload documents to the knowledge base for RAG functionality
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Document file to upload
+                metadata:
+                  type: string
+                  description: JSON metadata for the document
+                  example: '{"category":"policies","classification":"internal"}'
+              required: [file]
+      responses:
+        '202':
+          description: Document upload accepted for processing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentUploadResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /knowledge/query:
+    post:
+      tags: [Knowledge Base]
+      summary: Query knowledge base
+      description: Perform RAG query against the knowledge base with citations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeQueryRequest'
+      responses:
+        '200':
+          description: Query results with citations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeQueryResponse'
+
+  # Execution Monitoring
+  /executions/{execution_id}:
+    get:
+      tags: [Execution Monitoring]
+      summary: Get execution status
+      description: Retrieve status and results of a workflow execution
+      parameters:
+        - name: execution_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution status and results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionStatus'
+
+  /executions/{execution_id}/cancel:
+    post:
+      tags: [Execution Monitoring]
+      summary: Cancel execution
+      description: Cancel a running workflow execution
+      parameters:
+        - name: execution_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CancelExecutionResponse'
+
+  # Security & Audit
+  /audit/logs:
+    get:
+      tags: [Security & Audit]
+      summary: Get audit logs
+      description: Retrieve audit logs for compliance and security monitoring
+      parameters:
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: event_type
+          in: query
+          schema:
+            type: string
+        - name: agent_id
+          in: query
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Audit logs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+
+  /security/scan:
+    post:
+      tags: [Security & Audit]
+      summary: Security scan
+      description: Perform security scan on agent configuration or workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityScanRequest'
+      responses:
+        '200':
+          description: Security scan completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityScanResponse'
+
+  # Monitoring & Metrics
+  /metrics:
+    get:
+      tags: [Monitoring]
+      summary: Get metrics
+      description: Retrieve performance and usage metrics
+      parameters:
+        - name: metric
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [executions, latency, errors, costs]
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [1h, 24h, 7d, 30d]
+            default: 24h
+        - name: granularity
+          in: query
+          schema:
+            type: string
+            enum: [minute, hour, day]
+            default: hour
+      responses:
+        '200':
+          description: Metrics data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+
+  /health:
+    get:
+      tags: [Monitoring]
+      summary: Health check
+      description: System health status and service availability
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API key for authentication
+
+  schemas:
+    # Agent Schemas
+    Agent:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "agent_1a2b3c4d5e6f"
+          description: Unique identifier for the agent
+        name:
+          type: string
+          example: "document-processor"
+          description: Human-readable name for the agent
+        type:
+          type: string
+          enum: [analysis, integration, knowledge, workflow, security]
+          example: "analysis"
+        description:
+          type: string
+          example: "Processes and analyzes documents"
+        status:
+          type: string
+          enum: [active, inactive, error]
+          example: "active"
+        capabilities:
+          type: array
+          items:
+            type: string
+          example: ["document_parsing", "text_extraction", "sentiment_analysis"]
+        config:
+          type: object
+          description: Agent-specific configuration
+        security_policy:
+          $ref: '#/components/schemas/SecurityPolicy'
+        created_at:
+          type: string
+          format: date-time
+        last_used:
+          type: string
+          format: date-time
+        usage_stats:
+          $ref: '#/components/schemas/UsageStats'
+        endpoints:
+          type: object
+          properties:
+            execute:
+              type: string
+            status:
+              type: string
+            logs:
+              type: string
+
+    CreateAgentRequest:
+      type: object
+      required: [name, type, capabilities]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          pattern: '^[a-zA-Z0-9\-_]+$'
+        type:
+          type: string
+          enum: [analysis, integration, knowledge, workflow, security]
+        description:
+          type: string
+          maxLength: 500
+        capabilities:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        config:
+          type: object
+          description: Agent-specific configuration
+        security_policy:
+          $ref: '#/components/schemas/SecurityPolicy'
+
+    UpdateAgentRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        capabilities:
+          type: array
+          items:
+            type: string
+        config:
+          type: object
+        security_policy:
+          $ref: '#/components/schemas/SecurityPolicy'
+
+    AgentListResponse:
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Agent'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Workflow Schemas
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+        error_handling:
+          $ref: '#/components/schemas/ErrorHandling'
+        created_at:
+          type: string
+          format: date-time
+
+    WorkflowStep:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [tool_execution, agent_execution, synthesis]
+        tool:
+          type: string
+        agent_type:
+          type: string
+        input_mapping:
+          type: object
+        depends_on:
+          type: array
+          items:
+            type: string
+        timeout:
+          type: integer
+
+    CreateWorkflowRequest:
+      type: object
+      required: [name, steps]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+        error_handling:
+          $ref: '#/components/schemas/ErrorHandling'
+
+    WorkflowListResponse:
+      type: object
+      properties:
+        workflows:
+          type: array
+          items:
+            $ref: '#/components/schemas/Workflow'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Execution Schemas
+    ExecuteWorkflowRequest:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          description: ID of the workflow to execute (optional for direct agent execution)
+        input_data:
+          type: object
+          description: Input data for the workflow
+        options:
+          type: object
+          properties:
+            async:
+              type: boolean
+              default: false
+            webhook_url:
+              type: string
+              format: uri
+            timeout_seconds:
+              type: integer
+              minimum: 1
+              maximum: 3600
+
+    WorkflowExecutionResult:
+      type: object
+      properties:
+        execution_id:
+          type: string
+        status:
+          type: string
+          enum: [completed, failed, partial]
+        result:
+          type: object
+          description: The execution result data
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+        metrics:
+          $ref: '#/components/schemas/ExecutionMetrics'
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    AsyncExecutionResponse:
+      type: object
+      properties:
+        execution_id:
+          type: string
+        status:
+          type: string
+          enum: [processing, queued]
+        started_at:
+          type: string
+          format: date-time
+        estimated_completion:
+          type: string
+          format: date-time
+        status_url:
+          type: string
+          format: uri
+
+    ExecutionStatus:
+      type: object
+      properties:
+        execution_id:
+          type: string
+        status:
+          type: string
+          enum: [queued, processing, completed, failed, cancelled]
+        progress:
+          type: number
+          minimum: 0
+          maximum: 1
+        current_step:
+          type: string
+        result:
+          type: object
+        error:
+          $ref: '#/components/schemas/Error'
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+
+    # Tool Schemas
+    Tool:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        specification:
+          $ref: '#/components/schemas/ToolSpecification'
+        access_policy:
+          $ref: '#/components/schemas/ToolAccessPolicy'
+        usage_stats:
+          $ref: '#/components/schemas/ToolUsageStats'
+
+    RegisterToolRequest:
+      type: object
+      required: [name, specification]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        version:
+          type: string
+        specification:
+          $ref: '#/components/schemas/ToolSpecification'
+        access_policy:
+          $ref: '#/components/schemas/ToolAccessPolicy'
+        implementation:
+          $ref: '#/components/schemas/ToolImplementation'
+
+    ToolSpecification:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [function, webhook]
+        function:
+          $ref: '#/components/schemas/FunctionSpec'
+
+    FunctionSpec:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        parameters:
+          type: object
+          description: JSON Schema for function parameters
+
+    ToolAccessPolicy:
+      type: object
+      properties:
+        agent_types:
+          type: array
+          items:
+            type: string
+        security_clearance:
+          type: string
+        rate_limit:
+          $ref: '#/components/schemas/RateLimit'
+
+    ToolImplementation:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [webhook, builtin]
+        endpoint:
+          type: string
+          format: uri
+        authentication:
+          $ref: '#/components/schemas/Authentication'
+
+    ToolListResponse:
+      type: object
+      properties:
+        tools:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tool'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # Knowledge Base Schemas
+    DocumentUploadResponse:
+      type: object
+      properties:
+        document_id:
+          type: string
+        status:
+          type: string
+          enum: [processing, completed, failed]
+        metadata:
+          type: object
+        processing_status:
+          type: object
+          properties:
+            chunking:
+              type: string
+            embedding:
+              type: string
+            indexing:
+              type: string
+
+    KnowledgeQueryRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          minLength: 1
+        filters:
+          type: object
+          description: Filters for search results
+        options:
+          type: object
+          properties:
+            max_results:
+              type: integer
+              minimum: 1
+              maximum: 50
+              default: 5
+            include_citations:
+              type: boolean
+              default: true
+            similarity_threshold:
+              type: number
+              minimum: 0
+              maximum: 1
+              default: 0.75
+
+    KnowledgeQueryResponse:
+      type: object
+      properties:
+        query:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeResult'
+        total_results:
+          type: integer
+        processing_time:
+          type: number
+
+    KnowledgeResult:
+      type: object
+      properties:
+        content:
+          type: string
+        score:
+          type: number
+        citation:
+          $ref: '#/components/schemas/Citation'
+        metadata:
+          type: object
+
+    Citation:
+      type: object
+      properties:
+        document_id:
+          type: string
+        source:
+          type: string
+          description: Source reference with location
+        title:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    # Security & Audit Schemas
+    SecurityPolicy:
+      type: object
+      properties:
+        data_classification:
+          type: string
+          enum: [public, internal, confidential, restricted]
+        retention_days:
+          type: integer
+          minimum: 1
+        encryption_required:
+          type: boolean
+        access_controls:
+          type: array
+          items:
+            type: string
+
+    SecurityScanRequest:
+      type: object
+      required: [target_type, target_id]
+      properties:
+        target_type:
+          type: string
+          enum: [agent, workflow, tool]
+        target_id:
+          type: string
+        scan_type:
+          type: string
+          enum: [vulnerability_assessment, compliance_check, security_audit]
+        options:
+          type: object
+
+    SecurityScanResponse:
+      type: object
+      properties:
+        scan_id:
+          type: string
+        status:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        results:
+          type: object
+          properties:
+            overall_score:
+              type: number
+            vulnerabilities:
+              type: array
+              items:
+                $ref: '#/components/schemas/SecurityVulnerability'
+            compliance:
+              type: object
+
+    SecurityVulnerability:
+      type: object
+      properties:
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        category:
+          type: string
+        description:
+          type: string
+        recommendation:
+          type: string
+
+    AuditLogResponse:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    AuditLogEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        event_type:
+          type: string
+        agent_id:
+          type: string
+        user_id:
+          type: string
+        action:
+          type: string
+        resource:
+          type: string
+        ip_address:
+          type: string
+        user_agent:
+          type: string
+        result:
+          type: string
+        metadata:
+          type: object
+
+    # Monitoring Schemas
+    MetricsResponse:
+      type: object
+      properties:
+        metric:
+          type: string
+        period:
+          type: string
+        granularity:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetricDataPoint'
+        summary:
+          $ref: '#/components/schemas/MetricSummary'
+
+    MetricDataPoint:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        value:
+          type: number
+        metadata:
+          type: object
+
+    MetricSummary:
+      type: object
+      properties:
+        total:
+          type: number
+        average:
+          type: number
+        peak:
+          type: number
+        success_rate:
+          type: number
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        services:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ServiceHealth'
+        region:
+          type: string
+        version:
+          type: string
+
+    ServiceHealth:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        response_time:
+          type: number
+        uptime:
+          type: number
+        message:
+          type: string
+
+    # Common Schemas
+    Error:
+      type: object
+      properties:
+        type:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+        request_id:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+        has_more:
+          type: boolean
+        next_cursor:
+          type: string
+
+    UsageStats:
+      type: object
+      properties:
+        total_executions:
+          type: integer
+        success_rate:
+          type: number
+        avg_execution_time:
+          type: number
+
+    ToolUsageStats:
+      type: object
+      properties:
+        total_calls:
+          type: integer
+        success_rate:
+          type: number
+        avg_response_time:
+          type: number
+
+    ExecutionMetrics:
+      type: object
+      properties:
+        execution_time:
+          type: number
+        tokens_used:
+          type: integer
+        cost:
+          type: number
+        memory_used:
+          type: integer
+        cpu_time:
+          type: number
+
+    ErrorHandling:
+      type: object
+      properties:
+        retry_policy:
+          type: object
+          properties:
+            max_retries:
+              type: integer
+            backoff_strategy:
+              type: string
+              enum: [linear, exponential]
+        fallback_strategy:
+          type: string
+          enum: [fail_fast, partial_results, fallback_agent]
+
+    RateLimit:
+      type: object
+      properties:
+        requests_per_minute:
+          type: integer
+        concurrent_requests:
+          type: integer
+
+    Authentication:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [bearer_token, api_key, oauth2]
+        token:
+          type: string
+
+    CancelExecutionResponse:
+      type: object
+      properties:
+        execution_id:
+          type: string
+        status:
+          type: string
+          enum: [cancelled, cancelling]
+        cancelled_at:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters or request body
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: "validation_error"
+            code: "INVALID_AGENT_CONFIG"
+            message: "Agent configuration contains invalid capabilities"
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: "authentication_error"
+            code: "INVALID_API_KEY"
+            message: "API key is invalid or expired"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: "not_found_error"
+            code: "AGENT_NOT_FOUND"
+            message: "Specified agent does not exist"
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Request limit per time window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Remaining requests in current window
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: Timestamp when rate limit resets
+        X-RateLimit-Burst:
+          schema:
+            type: integer
+          description: Burst limit for short periods
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: "rate_limit_error"
+            code: "RATE_LIMIT_EXCEEDED"
+            message: "Rate limit exceeded. Please retry after reset time."
+
+tags:
+  - name: Agent Management
+    description: Create, update, and manage AI agents
+  - name: Agent Execution
+    description: Execute workflows and tasks using agents
+  - name: Workflow Management
+    description: Define and manage multi-step workflows
+  - name: Tool Registry
+    description: Register and manage tools for agent use
+  - name: Knowledge Base
+    description: Upload documents and query knowledge base with RAG
+  - name: Execution Monitoring
+    description: Monitor and manage workflow executions
+  - name: Security & Audit
+    description: Security scanning and audit trail management
+  - name: Monitoring
+    description: System health and performance metrics
+
+x-code-samples:
+  - lang: Python
+    source: |
+      from ai_agent_framework import AgentFramework
+      
+      framework = AgentFramework(api_key="your-api-key")
+      
+      agent = framework.create_agent(
+          name="document-processor",
+          type="analysis",
+          capabilities=["document_parsing", "text_extraction"]
+      )
+      
+      result = agent.execute_workflow({
+          "document_url": "https://example.com/doc.pdf"
+      })
+      
+  - lang: JavaScript
+    source: |
+      const { AgentFramework } = require('@ai-agent/framework');
+      
+      const framework = new AgentFramework({
+        apiKey: process.env.AI_AGENT_API_KEY
+      });
+      
+      const agent = await framework.createAgent({
+        name: 'document-processor',
+        type: 'analysis',
+        capabilities: ['document_parsing', 'text_extraction']
+      });
+      
+      const result = await agent.executeWorkflow({
+        document_url: 'https://example.com/doc.pdf'
+      });
+      
+  - lang: cURL
+    source: |
+      # Create agent
+      curl -X POST https://api.ai-agent-framework.com/v1/agents \
+        -H "Authorization: Bearer YOUR_API_KEY" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "name": "document-processor",
+          "type": "analysis",
+          "capabilities": ["document_parsing", "text_extraction"]
+        }'
+      
+      # Execute workflow
+      curl -X POST https://api.ai-agent-framework.com/v1/agents/agent_123/execute \
+        -H "Authorization: Bearer YOUR_API_KEY" \
+        -H "Content-Type: application/json" \
+        -d '{
+          "input_data": {
+            "document_url": "https://example.com/doc.pdf"
+          }
+        }'
