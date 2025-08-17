@@ -62,7 +62,7 @@ No incluye: técnicas avanzadas (LangGraph, Graph-RAG, observabilidad avanzada, 
 * **Módulo A — Conceptos esenciales** (agentes vs chat, JSON estructurado, seguridad mínima).
 * **Módulo B — Primer mini-agente** (Planner→Executor→Critic simple).
 * **Módulo C — RAG básico con citas** (BM25/TF-IDF, MMR, citas `uri#Lx-Ly`).
-* **Módulo D — Calidad/coste/tests mínimos** (quick evals, coste tokens, latencia básica).
+* **Módulo D — Calidad/coste/tests mínimos** (quick evals, coste tokens, latencia básica). ✅
 * **Módulo E — Capstone corto** (mini-agente + RAG que responde sobre un repo demo).
 
 ### 4.2 Funcionalidades del portal
@@ -116,7 +116,7 @@ No incluye: técnicas avanzadas (LangGraph, Graph-RAG, observabilidad avanzada, 
 | 1      | Landing + Módulo A               |
 | 2      | Módulo B + laboratorio           |
 | 3      | Módulo C + laboratorio           |
-| 4      | Módulo D                         |
+| 4      | Módulo D ✅                      |
 | 5      | Módulo E (capstone) + rúbrica    |
 | 6      | SEO, analítica, QA y publicación |
 
