@@ -1,5 +1,22 @@
+# AI Agents: From Zero to Production - CURSO COMPLETADO ✅
+## Curso Completo de Desarrollo de Agentes de IA
 
-# 📄 PRD — Portal 1 “Fundamentos de IA para Devs”
+**Estado:** ✅ Completado - 100% terminado
+**Última actualización:** Enero 2024
+
+### 📋 Progreso del Curso
+
+- ✅ **Módulo A**: Fundamentos de Agentes de IA (100%)
+- ✅ **Módulo B**: Arquitectura PEC (Planner-Executor-Critic) (100%)
+- ✅ **Módulo C**: RAG con Citas Canónicas (100%)
+- ✅ **Módulo D**: Quick Evals y Monitoreo (100%)
+- ✅ **Módulo E**: Proyecto Capstone - RepoGPT (100%)
+
+🎯 **¡CURSO FINALIZADO!** Has desarrollado un agente de IA completo y funcional.
+
+---
+
+# 📄 PRD — Portal 1 "Fundamentos de IA para Devs"# 📄 PRD — Portal 1 “Fundamentos de IA para Devs”
 
 ## 1. Introducción
 

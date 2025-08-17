@@ -101,12 +101,14 @@ class QuickEval:
             return EvalResult.FAIL
 ```
 
-### 2.3 Quick Evals Comunes
+### 2.3 Quick Evals Específicos para Diferentes Casos de Uso
 
-#### 2.3.1 Length Check
+#### 2.3.1 Evaluaciones de Contenido
+
+**Length Check - Control de Longitud:**
 ```python
 class LengthEval(QuickEval):
-    """Evaluar longitud de respuesta"""
+    """Evaluar longitud de respuesta apropiada"""
     
     def __init__(self, min_length: int = 10, max_length: int = 1000):
         super().__init__("length_check")
@@ -114,40 +116,304 @@ class LengthEval(QuickEval):
         self.max_length = max_length
     
     def evaluate(self, input_data: str, output_data: str) -> QuickEvalResult:
+        start_time = time.time()
         length = len(output_data)
         
-        if self.min_length <= length <= self.max_length:
+        # Scoring gradual en lugar de binario
+        if length < self.min_length:
+            score = max(0.0, length / self.min_length)
+            result = EvalResult.FAIL if score < 0.5 else EvalResult.WARNING
+            message = f"Respuesta muy corta: {length} chars (mín: {self.min_length})"
+        elif length > self.max_length:
+            score = max(0.0, 1.0 - (length - self.max_length) / self.max_length)
+            result = EvalResult.WARNING if score > 0.7 else EvalResult.FAIL
+            message = f"Respuesta muy larga: {length} chars (máx: {self.max_length})"
+        else:
             score = 1.0
             result = EvalResult.PASS
-            message = f"Length {length} within range"
-        else:
-            score = 0.0
-            result = EvalResult.FAIL
-            message = f"Length {length} outside range [{self.min_length}, {self.max_length}]"
+            message = f"Longitud apropiada: {length} chars"
         
         return QuickEvalResult(
             eval_name=self.name,
             result=result,
             score=score,
             message=message,
-            details={"length": length, "min": self.min_length, "max": self.max_length},
-            execution_time=0.001
+            details={
+                "length": length, 
+                "min": self.min_length, 
+                "max": self.max_length,
+                "words": len(output_data.split()),
+                "sentences": output_data.count('.') + output_data.count('!') + output_data.count('?')
+            },
+            execution_time=time.time() - start_time
         )
 ```
 
-#### 2.3.2 Forbidden Content
+**Forbidden Content - Detección de Contenido Prohibido:**
 ```python
 class ForbiddenContentEval(QuickEval):
-    """Detectar contenido prohibido"""
+    """Detectar contenido prohibido o inapropiado"""
     
-    def __init__(self, forbidden_terms: List[str]):
+    def __init__(self, forbidden_terms: List[str], severity_weights: Dict[str, float] = None):
         super().__init__("forbidden_content")
         self.forbidden_terms = [term.lower() for term in forbidden_terms]
+        self.severity_weights = severity_weights or {}
     
     def evaluate(self, input_data: str, output_data: str) -> QuickEvalResult:
+        start_time = time.time()
         output_lower = output_data.lower()
         found_terms = []
+        total_severity = 0.0
         
+        for term in self.forbidden_terms:
+            if term in output_lower:
+                count = output_lower.count(term)
+                weight = self.severity_weights.get(term, 1.0)
+                severity = count * weight
+                
+                found_terms.append({
+                    "term": term,
+                    "count": count,
+                    "weight": weight,
+                    "severity": severity
+                })
+                total_severity += severity
+        
+        if not found_terms:
+            score = 1.0
+            result = EvalResult.PASS
+            message = "No forbidden content detected"
+        else:
+            # Score basado en severidad total
+            score = max(0.0, 1.0 - total_severity / 10.0)  # Normalizar a escala
+            result = EvalResult.FAIL if score < 0.3 else EvalResult.WARNING
+            message = f"Found {len(found_terms)} forbidden terms (severity: {total_severity:.2f})"
+        
+        return QuickEvalResult(
+            eval_name=self.name,
+            result=result,
+            score=score,
+            message=message,
+            details={
+                "found_terms": found_terms,
+                "total_severity": total_severity,
+                "unique_violations": len(found_terms)
+            },
+            execution_time=time.time() - start_time
+        )
+
+# Ejemplo de uso
+forbidden_evaluator = ForbiddenContentEval(
+    forbidden_terms=["password", "credit card", "ssn", "hack"],
+    severity_weights={"password": 2.0, "hack": 3.0, "credit card": 5.0}
+)
+```
+
+#### 2.3.2 Evaluaciones de Calidad Técnica
+
+**JSON Validity - Validación de Formato JSON:**
+```python
+import json
+import jsonschema
+
+class JSONValidityEval(QuickEval):
+    """Evaluar validez y estructura de JSON"""
+    
+    def __init__(self, required_schema: Dict = None, required_fields: List[str] = None):
+        super().__init__("json_validity")
+        self.required_schema = required_schema
+        self.required_fields = required_fields or []
+    
+    def evaluate(self, input_data: str, output_data: str) -> QuickEvalResult:
+        start_time = time.time()
+        details = {}
+        
+        try:
+            # 1. Verificar que es JSON válido
+            parsed_json = json.loads(output_data)
+            details["valid_json"] = True
+            
+            # 2. Verificar campos requeridos
+            missing_fields = []
+            for field in self.required_fields:
+                if field not in parsed_json:
+                    missing_fields.append(field)
+            
+            details["missing_fields"] = missing_fields
+            details["has_all_required_fields"] = len(missing_fields) == 0
+            
+            # 3. Verificar schema si se proporciona
+            schema_valid = True
+            schema_errors = []
+            if self.required_schema:
+                try:
+                    jsonschema.validate(parsed_json, self.required_schema)
+                    details["schema_valid"] = True
+                except jsonschema.ValidationError as e:
+                    schema_valid = False
+                    schema_errors.append(str(e))
+                    details["schema_valid"] = False
+                    details["schema_errors"] = schema_errors
+            
+            # Calcular score
+            score = 0.6  # Base por JSON válido
+            if len(missing_fields) == 0:
+                score += 0.2
+            if schema_valid:
+                score += 0.2
+            
+            result = EvalResult.PASS if score >= 0.8 else EvalResult.WARNING
+            message = f"JSON válido. Campos faltantes: {len(missing_fields)}"
+            
+        except json.JSONDecodeError as e:
+            score = 0.0
+            result = EvalResult.FAIL
+            message = f"JSON inválido: {str(e)}"
+            details = {"valid_json": False, "error": str(e)}
+        
+        return QuickEvalResult(
+            eval_name=self.name,
+            result=result,
+            score=score,
+            message=message,
+            details=details,
+            execution_time=time.time() - start_time
+        )
+```
+
+**Relevance Check - Evaluación de Relevancia:**
+```python
+class RelevanceEval(QuickEval):
+    """Evaluar relevancia de la respuesta a la pregunta"""
+    
+    def __init__(self, similarity_threshold: float = 0.3):
+        super().__init__("relevance_check")
+        self.threshold = similarity_threshold
+    
+    def _calculate_word_overlap(self, query: str, response: str) -> float:
+        """Calcular overlap de palabras clave"""
+        query_words = set(query.lower().split())
+        response_words = set(response.lower().split())
+        
+        # Filtrar palabras comunes (stop words básicos)
+        stop_words = {"the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by"}
+        query_words -= stop_words
+        response_words -= stop_words
+        
+        if not query_words:
+            return 0.0
+        
+        overlap = len(query_words & response_words)
+        return overlap / len(query_words)
+    
+    def _check_question_answered(self, query: str, response: str) -> bool:
+        """Verificar si la respuesta aborda la pregunta"""
+        query_lower = query.lower()
+        response_lower = response.lower()
+        
+        # Buscar patrones de preguntas y respuestas correspondientes
+        question_patterns = {
+            "what": ["is", "are", "means", "definition"],
+            "how": ["steps", "process", "way", "method"],
+            "why": ["because", "reason", "due to", "since"],
+            "when": ["date", "time", "year", "day"],
+            "where": ["location", "place", "address", "at"]
+        }
+        
+        for q_word, answer_indicators in question_patterns.items():
+            if q_word in query_lower:
+                if any(indicator in response_lower for indicator in answer_indicators):
+                    return True
+        
+        return False
+    
+    def evaluate(self, input_data: str, output_data: str) -> QuickEvalResult:
+        start_time = time.time()
+        
+        # Calcular métricas de relevancia
+        word_overlap = self._calculate_word_overlap(input_data, output_data)
+        question_answered = self._check_question_answered(input_data, output_data)
+        
+        # Score combinado
+        score = word_overlap * 0.6 + (0.4 if question_answered else 0.0)
+        
+        if score >= 0.7:
+            result = EvalResult.PASS
+            message = f"Alta relevancia (score: {score:.2f})"
+        elif score >= 0.4:
+            result = EvalResult.WARNING
+            message = f"Relevancia moderada (score: {score:.2f})"
+        else:
+            result = EvalResult.FAIL
+            message = f"Baja relevancia (score: {score:.2f})"
+        
+        return QuickEvalResult(
+            eval_name=self.name,
+            result=result,
+            score=score,
+            message=message,
+            details={
+                "word_overlap": word_overlap,
+                "question_answered": question_answered,
+                "query_words": len(input_data.split()),
+                "response_words": len(output_data.split())
+            },
+            execution_time=time.time() - start_time
+        )
+```
+
+#### 2.3.3 Evaluaciones de Performance
+
+**Response Time Check:**
+```python
+class ResponseTimeEval(QuickEval):
+    """Evaluar tiempo de respuesta"""
+    
+    def __init__(self, max_time: float = 5.0, warning_time: float = 3.0):
+        super().__init__("response_time")
+        self.max_time = max_time
+        self.warning_time = warning_time
+    
+    def evaluate(self, input_data: Any, output_data: Any, response_time: float = None) -> QuickEvalResult:
+        if response_time is None:
+            return QuickEvalResult(
+                eval_name=self.name,
+                result=EvalResult.FAIL,
+                score=0.0,
+                message="Response time not provided",
+                details={},
+                execution_time=0.001
+            )
+        
+        if response_time <= self.warning_time:
+            score = 1.0
+            result = EvalResult.PASS
+            message = f"Excelente tiempo de respuesta: {response_time:.2f}s"
+        elif response_time <= self.max_time:
+            score = 1.0 - (response_time - self.warning_time) / (self.max_time - self.warning_time)
+            result = EvalResult.WARNING
+            message = f"Tiempo de respuesta aceptable: {response_time:.2f}s"
+        else:
+            score = 0.0
+            result = EvalResult.FAIL
+            message = f"Tiempo de respuesta excesivo: {response_time:.2f}s"
+        
+        return QuickEvalResult(
+            eval_name=self.name,
+            result=result,
+            score=score,
+            message=message,
+            details={
+                "response_time": response_time,
+                "max_time": self.max_time,
+                "warning_time": self.warning_time,
+                "performance_category": "excellent" if response_time <= 1.0 else 
+                                      "good" if response_time <= 2.0 else
+                                      "acceptable" if response_time <= self.max_time else "poor"
+            },
+            execution_time=0.001
+        )
+```
         for term in self.forbidden_terms:
             if term in output_lower:
                 found_terms.append(term)

@@ -463,9 +463,279 @@ un resumen ejecutivo"
 
 ---
 
-## 8. Patrones de Manejo de Errores
+## 8. Patrones Avanzados de Manejo de Errores
 
-### 8.1 Estrategias de Recuperación
+### 8.1 Clasificación de Errores en Agentes
+
+Los agentes pueden enfrentar diferentes tipos de errores que requieren estrategias específicas:
+
+#### Errores Recuperables
+```python
+class RecoverableErrors:
+    """Errores que el agente puede manejar automáticamente"""
+    
+    TIMEOUT_ERRORS = [
+        "RequestTimeout",
+        "APITimeout", 
+        "NetworkTimeout"
+    ]
+    
+    RATE_LIMIT_ERRORS = [
+        "RateLimitExceeded",
+        "TooManyRequests",
+        "QuotaExceeded"
+    ]
+    
+    TEMPORARY_FAILURES = [
+        "ServiceUnavailable",
+        "TemporaryServerError",
+        "DatabaseLocked"
+    ]
+
+    @staticmethod
+    def get_retry_strategy(error_type: str) -> Dict:
+        """Obtener estrategia de retry según tipo de error"""
+        strategies = {
+            "timeout": {"max_retries": 3, "backoff": "exponential", "delay": 1},
+            "rate_limit": {"max_retries": 5, "backoff": "linear", "delay": 60},
+            "temporary": {"max_retries": 2, "backoff": "fixed", "delay": 5}
+        }
+        
+        for category, error_list in {
+            "timeout": RecoverableErrors.TIMEOUT_ERRORS,
+            "rate_limit": RecoverableErrors.RATE_LIMIT_ERRORS,
+            "temporary": RecoverableErrors.TEMPORARY_FAILURES
+        }.items():
+            if error_type in error_list:
+                return strategies[category]
+        
+        return {"max_retries": 1, "backoff": "none", "delay": 0}
+```
+
+#### Errores No Recuperables
+```python
+class NonRecoverableErrors:
+    """Errores que requieren intervención humana o cambio de plan"""
+    
+    AUTHENTICATION_ERRORS = [
+        "InvalidCredentials",
+        "AuthenticationFailed",
+        "PermissionDenied"
+    ]
+    
+    VALIDATION_ERRORS = [
+        "InvalidInput",
+        "SchemaValidationFailed",
+        "DataFormatError"
+    ]
+    
+    LOGIC_ERRORS = [
+        "DivisionByZero",
+        "IndexOutOfRange",
+        "NullPointerException"
+    ]
+```
+
+### 8.2 Estrategias de Recuperación Inteligente
+
+#### Retry con Backoff Exponencial
+```python
+import time
+import random
+from typing import Callable, Any
+
+class SmartRetryHandler:
+    """Manejador inteligente de reintentos"""
+    
+    def __init__(self, max_retries: int = 3):
+        self.max_retries = max_retries
+        self.attempt_count = 0
+    
+    def exponential_backoff(self, attempt: int, base_delay: float = 1.0) -> float:
+        """Calcular delay con backoff exponencial + jitter"""
+        delay = base_delay * (2 ** attempt)
+        jitter = random.uniform(0, 0.1) * delay  # Añadir jitter para evitar thundering herd
+        return delay + jitter
+    
+    def should_retry(self, error: Exception) -> bool:
+        """Decidir si vale la pena reintentar"""
+        error_name = type(error).__name__
+        
+        # No reintentar errores de autenticación o validación
+        if error_name in NonRecoverableErrors.AUTHENTICATION_ERRORS + NonRecoverableErrors.VALIDATION_ERRORS:
+            return False
+        
+        # Reintentar errores temporales y de red
+        if error_name in RecoverableErrors.TIMEOUT_ERRORS + RecoverableErrors.TEMPORARY_FAILURES:
+            return self.attempt_count < self.max_retries
+        
+        return False
+    
+    def execute_with_retry(self, func: Callable, *args, **kwargs) -> Any:
+        """Ejecutar función con retry inteligente"""
+        self.attempt_count = 0
+        last_error = None
+        
+        while self.attempt_count <= self.max_retries:
+            try:
+                result = func(*args, **kwargs)
+                return result
+                
+            except Exception as e:
+                last_error = e
+                self.attempt_count += 1
+                
+                if not self.should_retry(e):
+                    raise e
+                
+                if self.attempt_count <= self.max_retries:
+                    delay = self.exponential_backoff(self.attempt_count)
+                    print(f"⚠️ Attempt {self.attempt_count} failed: {e}")
+                    print(f"🔄 Retrying in {delay:.2f}s...")
+                    time.sleep(delay)
+        
+        raise last_error
+```
+
+### 8.3 Estrategias de Fallback
+
+```python
+class FallbackStrategy:
+    """Estrategias de fallback cuando fallan las herramientas principales"""
+    
+    def __init__(self):
+        self.fallback_chains = {
+            "search": [
+                self.primary_search,
+                self.backup_search, 
+                self.cached_search,
+                self.default_response
+            ],
+            "calculate": [
+                self.primary_calculator,
+                self.simple_calculator,
+                self.manual_calculation
+            ]
+        }
+    
+    def execute_with_fallback(self, tool_type: str, *args, **kwargs):
+        """Ejecutar con cadena de fallbacks"""
+        fallback_chain = self.fallback_chains.get(tool_type, [])
+        
+        for i, fallback_func in enumerate(fallback_chain):
+            try:
+                result = fallback_func(*args, **kwargs)
+                
+                if i > 0:  # Si usamos fallback, loggear
+                    print(f"⚠️ Used fallback #{i} for {tool_type}")
+                
+                return result
+                
+            except Exception as e:
+                if i == len(fallback_chain) - 1:  # Último fallback
+                    raise Exception(f"All fallbacks failed for {tool_type}: {e}")
+                continue
+    
+    # Implementaciones de ejemplo
+    def primary_search(self, query: str) -> str:
+        # Búsqueda principal (puede fallar)
+        raise Exception("Primary search API down")
+    
+    def backup_search(self, query: str) -> str:
+        # Búsqueda backup
+        return f"Backup search results for: {query}"
+    
+    def cached_search(self, query: str) -> str:
+        # Resultados en caché
+        return f"Cached results for: {query}"
+    
+    def default_response(self, query: str) -> str:
+        # Respuesta por defecto
+        return "Unable to perform search at this time. Please try again later."
+```
+
+### 8.4 Circuit Breaker Pattern Avanzado
+
+```python
+from enum import Enum
+from dataclasses import dataclass
+import time
+
+class CircuitState(Enum):
+    CLOSED = "closed"      # Funcionamiento normal
+    OPEN = "open"          # Circuito abierto, falla rápida
+    HALF_OPEN = "half_open"  # Probando si el servicio se recuperó
+
+@dataclass
+class CircuitConfig:
+    failure_threshold: int = 5      # Fallos para abrir circuito
+    success_threshold: int = 3      # Éxitos para cerrar circuito  
+    timeout: float = 60.0          # Tiempo antes de probar HALF_OPEN
+
+class AdvancedCircuitBreaker:
+    """Circuit Breaker avanzado con ventana deslizante"""
+    
+    def __init__(self, config: CircuitConfig):
+        self.config = config
+        self.state = CircuitState.CLOSED
+        self.call_history = []  # Lista de (timestamp, success/failure)
+        self.consecutive_failures = 0
+        self.consecutive_successes = 0
+        self.last_failure_time = 0
+    
+    def call(self, func, *args, **kwargs):
+        """Ejecutar función con circuit breaker avanzado"""
+        current_time = time.time()
+        
+        # Si está OPEN, verificar si es tiempo de probar
+        if self.state == CircuitState.OPEN:
+            if current_time - self.last_failure_time > self.config.timeout:
+                self.state = CircuitState.HALF_OPEN
+                print("🔄 Circuit breaker moved to HALF_OPEN")
+            else:
+                raise Exception(f"Circuit breaker is OPEN. Try again in {self.config.timeout - (current_time - self.last_failure_time):.1f}s")
+        
+        try:
+            result = func(*args, **kwargs)
+            self._on_success(current_time)
+            return result
+            
+        except Exception as e:
+            self._on_failure(current_time)
+            raise e
+    
+    def _on_success(self, timestamp: float):
+        """Manejar llamada exitosa"""
+        self.call_history.append((timestamp, True))
+        self.consecutive_failures = 0
+        self.consecutive_successes += 1
+        
+        # Si estamos en HALF_OPEN y tenemos suficientes éxitos, cerrar circuito
+        if self.state == CircuitState.HALF_OPEN and self.consecutive_successes >= self.config.success_threshold:
+            self.state = CircuitState.CLOSED
+            print("✅ Circuit breaker CLOSED - Service recovered")
+    
+    def _on_failure(self, timestamp: float):
+        """Manejar llamada fallida"""
+        self.call_history.append((timestamp, False))
+        self.consecutive_successes = 0
+        self.consecutive_failures += 1
+        self.last_failure_time = timestamp
+        
+        # Verificar si debemos abrir el circuito
+        if self.consecutive_failures >= self.config.failure_threshold:
+            self.state = CircuitState.OPEN
+            print(f"❌ Circuit breaker OPENED after {self.consecutive_failures} failures")
+        
+        # Si estamos en HALF_OPEN y falla, volver a OPEN
+        elif self.state == CircuitState.HALF_OPEN:
+            self.state = CircuitState.OPEN
+            print("❌ Circuit breaker back to OPEN - Service still failing")
+```
+
+## 8bis. Patrones de Manejo de Errores (Básicos)
+
+### 8bis.1 Estrategias de Recuperación
 
 ```python
 class ErrorRecoveryStrategy:
@@ -484,7 +754,7 @@ class ErrorRecoveryStrategy:
         return self.RETRY_STRATEGIES.get(error_type, 'abort_and_report')
 ```
 
-### 8.2 Circuit Breaker Pattern
+### 8bis.2 Circuit Breaker Pattern (Básico)
 
 ```python
 class CircuitBreaker:

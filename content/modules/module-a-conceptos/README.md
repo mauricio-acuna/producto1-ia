@@ -41,7 +41,9 @@ Un **agente de IA** es un sistema que puede:
 └─────────────────────────────────────────┘
 ```
 
-### 1.3 Ejemplo Práctico
+### 1.3 Ejemplos Prácticos Detallados
+
+#### Ejemplo 1: Gestión de Tareas Complejas
 
 **Escenario:** "Busca información sobre el clima en Madrid y programa un recordatorio"
 
@@ -63,20 +65,113 @@ Agente:
 5. 💬 RESPONDO: "En Madrid hace 22°C y está soleado. He creado un recordatorio para mañana."
 ```
 
+#### Ejemplo 2: Análisis de Datos y Toma de Decisiones
+
+**Escenario:** "Analiza las ventas del último trimestre y sugiere estrategias"
+
+**Chat tradicional:**
+```
+Usuario: "¿Cómo van las ventas?"
+Bot: "No tengo acceso a datos de ventas actuales."
+```
+
+**Agente de IA:**
+```
+Usuario: "Analiza las ventas del último trimestre y sugiere estrategias"
+
+Agente:
+1. 🔍 PLAN: Acceder a datos → Analizar tendencias → Generar estrategias
+2. 📊 EJECUTO: Consulto base de datos → "Ventas Q3: -15% vs Q2"
+3. 📈 EJECUTO: Analizo por producto → "Producto A: -30%, Producto B: +10%"
+4. 🎯 EJECUTO: Genero estrategias → "Enfocar marketing en Producto A"
+5. ✅ EVALÚO: Análisis completo con 3 recomendaciones específicas
+6. 💬 RESPONDO: Reporte detallado con gráficos y plan de acción
+```
+
+#### Ejemplo 3: Automatización de Flujos de Trabajo
+
+**Escenario:** "Si baja el inventario de productos, contacta a proveedores"
+
+**Chat tradicional:**
+```
+Usuario: "¿Puedes monitorear el inventario?"
+Bot: "No puedo ejecutar tareas de monitoreo continuo."
+```
+
+**Agente de IA:**
+```
+Agente (automáticamente):
+1. 🔍 MONITOREO: Reviso inventario cada hora
+2. ⚠️ DETECTO: Producto X tiene 5 unidades (límite: 10)
+3. 📧 EJECUTO: Envío email a proveedor con orden automática
+4. 📱 EJECUTO: Notifico al gerente de compras
+5. ✅ EVALÚO: Orden enviada, timeline de reposición confirmado
+6. 💬 ACTUALIZO: Dashboard con estado actual
+```
+
 ---
 
 ## 2. Chat vs Agente: Diferencias Clave
 
-### 2.1 Tabla Comparativa
+### 2.1 Tabla Comparativa Detallada
 
-| Aspecto | Chat Tradicional | Agente de IA |
-|---------|------------------|--------------|
-| **Flujo** | Entrada → Proceso → Salida | Observar → Planificar → Actuar → Evaluar |
-| **Memoria** | Conversación actual | Estado persistente + historial |
-| **Herramientas** | Solo texto | Múltiples APIs y sistemas |
-| **Autonomía** | Reactivo | Proactivo |
-| **Planificación** | No | Sí (objetivos a corto/largo plazo) |
-| **Adaptabilidad** | Limitada | Alta |
+| Aspecto | Chat Tradicional | Agente de IA | Ejemplo Práctico |
+|---------|------------------|--------------|------------------|
+| **Flujo** | Entrada → Proceso → Salida | Observar → Planificar → Actuar → Evaluar | Chat: "¿Qué es Python?" → respuesta. Agente: Analiza contexto → planifica explicación → ejecuta búsqueda → evalúa comprensión |
+| **Memoria** | Conversación actual | Estado persistente + historial | Chat: Olvida contexto anterior. Agente: Recuerda preferencias, historial de tareas, estado de proyectos |
+| **Herramientas** | Solo texto | Múltiples APIs y sistemas | Chat: Solo respuestas de texto. Agente: APIs, bases de datos, archivos, notificaciones |
+| **Autonomía** | Reactivo | Proactivo | Chat: Espera preguntas. Agente: Monitorea, detecta problemas, actúa preventivamente |
+| **Planificación** | No | Sí (objetivos a corto/largo plazo) | Chat: Una respuesta por vez. Agente: Planifica secuencias de 5-10 pasos |
+| **Adaptabilidad** | Limitada | Alta | Chat: Respuestas fijas. Agente: Se adapta según feedback y contexto |
+
+### 2.2 Casos de Uso Específicos
+
+#### 🔄 Cuándo Usar Chat Tradicional
+
+**Mejor para:**
+- Preguntas simples de información
+- FAQ y soporte básico  
+- Consultas puntuales
+- Cuando no se requiere estado/memoria
+
+**Ejemplos:**
+```
+✅ "¿Cuál es la capital de Francia?"
+✅ "¿Cómo se dice 'hola' en japonés?"
+✅ "¿Qué significa REST API?"
+✅ "Explica qué es un array"
+```
+
+#### 🤖 Cuándo Usar Agentes de IA
+
+**Mejor para:**
+- Tareas multi-paso complejas
+- Integración con sistemas externos
+- Workflows automatizados
+- Análisis y toma de decisiones
+
+**Ejemplos:**
+```
+✅ "Analiza el rendimiento de nuestro sitio web y optimízalo"
+✅ "Gestiona el inventario y haz pedidos cuando sea necesario"
+✅ "Revisa este código y sugiere mejoras de seguridad"
+✅ "Programa reuniones considerando disponibilidad de todos"
+```
+
+### 2.3 Evolución: De Chat a Agente
+
+```mermaid
+graph LR
+    A[Chat Básico] --> B[Chat con Memoria]
+    B --> C[Chat con Herramientas]
+    C --> D[Agente Simple]
+    D --> E[Agente Autónomo]
+    
+    A1[Respuestas fijas] --> B1[Contexto conversacional]
+    B1 --> C1[Acceso a APIs]
+    C1 --> D1[Planificación básica]
+    D1 --> E1[Toma de decisiones]
+```
 
 ### 2.2 Cuándo Usar Cada Uno
 

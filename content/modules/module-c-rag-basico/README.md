@@ -121,33 +121,187 @@ class TFIDFRetriever:
         return scores[:top_k]
 ```
 
-### 2.2 BM25 (Best Matching 25)
+### 2.2 BM25 (Best Matching 25) - Explicación Detallada
 
-**Concepto:** Mejora de TF-IDF que considera longitud del documento y saturación de términos.
+**Concepto:** BM25 es una mejora significativa de TF-IDF que considera:
+1. **Saturación de términos**: Los términos muy frecuentes no dominan excesivamente
+2. **Longitud del documento**: Normaliza por longitud para evitar bias hacia documentos largos
+3. **Relevancia no lineal**: Usa funciones que mejor reflejan la relevancia humana
 
-**Fórmula:**
+**Ventajas sobre TF-IDF:**
+- Maneja mejor documentos de diferentes longitudes
+- Menos susceptible a spam de palabras clave
+- Rendimiento empíricamente superior en búsquedas
+
+**Fórmula BM25:**
 ```
 BM25(q,d) = Σ IDF(qi) × (tf(qi,d) × (k1 + 1)) / (tf(qi,d) + k1 × (1 - b + b × |d|/avgdl))
+
+Donde:
+- q = query (consulta)
+- d = document (documento)
+- qi = término i en la query
+- tf(qi,d) = frecuencia del término qi en documento d
+- |d| = longitud del documento d
+- avgdl = longitud promedio de documentos en la colección
+- k1 = parámetro de saturación de términos (típicamente 1.2-2.0)
+- b = parámetro de normalización por longitud (típicamente 0.75)
+- IDF(qi) = log((N - df(qi) + 0.5) / (df(qi) + 0.5))
 ```
 
-**Parámetros:**
-- `k1`: Controla saturación de términos (típicamente 1.2-2.0)
-- `b`: Controla impacto de longitud de documento (típicamente 0.75)
-
-**Implementación:**
+**Implementación Completa:**
 ```python
+import math
+from collections import Counter
+from typing import List, Dict, Tuple
+
 class BM25Retriever:
     def __init__(self, documents: List[str], k1: float = 1.5, b: float = 0.75):
         self.documents = documents
-        self.k1 = k1
-        self.b = b
-        self.avgdl = sum(len(doc.split()) for doc in documents) / len(documents)
-        self.doc_freqs = []
-        self.idf = {}
+        self.k1 = k1  # Controla saturación de términos
+        self.b = b    # Controla impacto de longitud de documento
+        
+        # Preprocesar documentos
+        self.processed_docs = [doc.lower().split() for doc in documents]
+        self.doc_lengths = [len(doc) for doc in self.processed_docs]
+        self.avgdl = sum(self.doc_lengths) / len(self.doc_lengths)
+        
+        # Calcular estadísticas
+        self.doc_freqs = []  # Frecuencias por documento
+        self.idf = {}       # IDF scores
         self._initialize()
     
     def _initialize(self):
         """Inicializar frecuencias e IDF"""
+        # Calcular frecuencias por documento
+        for doc in self.processed_docs:
+            self.doc_freqs.append(Counter(doc))
+        
+        # Calcular IDF para cada término único
+        all_terms = set()
+        for doc in self.processed_docs:
+            all_terms.update(doc)
+        
+        N = len(self.documents)
+        for term in all_terms:
+            # Contar documentos que contienen el término
+            df = sum(1 for doc in self.processed_docs if term in doc)
+            
+            # Fórmula IDF de BM25 (diferente a TF-IDF clásico)
+            self.idf[term] = math.log((N - df + 0.5) / (df + 0.5))
+    
+    def _score_document(self, query_terms: List[str], doc_idx: int) -> float:
+        """Calcular score BM25 para un documento específico"""
+        score = 0.0
+        doc_freqs = self.doc_freqs[doc_idx]
+        doc_length = self.doc_lengths[doc_idx]
+        
+        for term in query_terms:
+            if term in doc_freqs:
+                tf = doc_freqs[term]
+                idf = self.idf.get(term, 0)
+                
+                # Fórmula BM25
+                numerator = tf * (self.k1 + 1)
+                denominator = tf + self.k1 * (1 - self.b + self.b * doc_length / self.avgdl)
+                
+                score += idf * (numerator / denominator)
+        
+        return score
+    
+    def search(self, query: str, top_k: int = 5) -> List[Tuple[int, float, str]]:
+        """Buscar documentos más relevantes usando BM25"""
+        query_terms = query.lower().split()
+        scores = []
+        
+        for i in range(len(self.documents)):
+            score = self._score_document(query_terms, i)
+            scores.append((i, score, self.documents[i]))
+        
+        # Ordenar por score descendente
+        scores.sort(key=lambda x: x[1], reverse=True)
+        return scores[:top_k]
+    
+    def explain_score(self, query: str, doc_idx: int) -> Dict:
+        """Explicar cómo se calculó el score (para debugging)"""
+        query_terms = query.lower().split()
+        doc_freqs = self.doc_freqs[doc_idx]
+        doc_length = self.doc_lengths[doc_idx]
+        
+        explanation = {
+            "query": query,
+            "document_index": doc_idx,
+            "document_length": doc_length,
+            "avg_doc_length": self.avgdl,
+            "k1": self.k1,
+            "b": self.b,
+            "term_scores": {}
+        }
+        
+        total_score = 0.0
+        for term in query_terms:
+            if term in doc_freqs:
+                tf = doc_freqs[term]
+                idf = self.idf.get(term, 0)
+                
+                numerator = tf * (self.k1 + 1)
+                denominator = tf + self.k1 * (1 - self.b + self.b * doc_length / self.avgdl)
+                term_score = idf * (numerator / denominator)
+                
+                explanation["term_scores"][term] = {
+                    "tf": tf,
+                    "idf": idf,
+                    "term_score": term_score,
+                    "numerator": numerator,
+                    "denominator": denominator
+                }
+                total_score += term_score
+        
+        explanation["total_score"] = total_score
+        return explanation
+
+# Ejemplo de uso con explicación
+documents = [
+    "Python es un lenguaje de programación",
+    "Java es también un lenguaje de programación popular",
+    "Los lenguajes de programación son herramientas útiles",
+    "Python tiene una sintaxis simple y clara"
+]
+
+bm25 = BM25Retriever(documents)
+results = bm25.search("Python programación", top_k=2)
+
+print("Resultados BM25:")
+for idx, score, doc in results:
+    print(f"Score: {score:.4f} - Doc: {doc}")
+
+# Explicar el score del primer resultado
+explanation = bm25.explain_score("Python programación", results[0][0])
+print(f"\nExplicación del score:")
+print(f"Score total: {explanation['total_score']:.4f}")
+for term, details in explanation['term_scores'].items():
+    print(f"  {term}: TF={details['tf']}, IDF={details['idf']:.3f}, Score={details['term_score']:.4f}")
+```
+
+**Comparación TF-IDF vs BM25:**
+
+| Aspecto | TF-IDF | BM25 |
+|---------|--------|------|
+| **Saturación** | Lineal (más TF = más score) | Saturada (TF alto no domina) |
+| **Longitud** | No considera longitud | Normaliza por longitud |
+| **Parámetros** | Sin parámetros ajustables | k1 y b ajustables |
+| **Performance** | Buena para casos simples | Superior empíricamente |
+| **Complejidad** | Simple | Moderada |
+
+```python
+# Demostración de diferencias
+query = "Python"
+doc1 = "Python Python Python Python"  # Documento corto con repetición
+doc2 = "Python es un lenguaje de programación interpretado y de alto nivel"
+
+# Con TF-IDF, doc1 podría ganar por alta frecuencia
+# Con BM25, doc2 probablemente gane por ser más informativo
+```
         df = {}  # document frequency
         
         for doc in self.documents:
