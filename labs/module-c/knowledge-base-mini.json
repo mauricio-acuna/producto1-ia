@@ -1,0 +1,116 @@
+{
+  "metadata": {
+    "name": "Knowledge Base Mini - Portal 1 IA",
+    "description": "Base de conocimiento compacta para pruebas de RAG",
+    "version": "1.0",
+    "created_at": "2025-08-17",
+    "total_documents": 8,
+    "domains": ["ai", "python", "web-development", "data-science", "apis"]
+  },
+  "documents": [
+    {
+      "id": "doc_ai_001",
+      "uri": "kb://fundamentals/ai-introduction.md",
+      "title": "Introducción a la Inteligencia Artificial",
+      "content": "La Inteligencia Artificial (IA) es el campo de la informática que se enfoca en crear sistemas capaces de realizar tareas que requieren inteligencia humana.\n\nTipos principales de IA:\n1. IA Estrecha (ANI): Sistemas especializados en tareas específicas\n2. IA General (AGI): Sistemas con capacidades cognitivas humanas\n3. IA Superinteligente (ASI): Sistemas que superan la inteligencia humana\n\nAplicaciones actuales:\n- Procesamiento de lenguaje natural\n- Visión por computadora\n- Sistemas de recomendación\n- Vehículos autónomos\n- Diagnóstico médico asistido\n\nLa IA moderna se basa en machine learning y deep learning, utilizando grandes datasets y poder computacional para entrenar modelos complejos.",
+      "author": "AI Research Team",
+      "tags": ["ai", "machine-learning", "deep-learning", "introduction"],
+      "metadata": {
+        "difficulty": "beginner",
+        "reading_time": "5 minutes",
+        "last_updated": "2025-08-15"
+      }
+    },
+    {
+      "id": "doc_ml_002", 
+      "uri": "kb://machine-learning/supervised-learning.md",
+      "title": "Aprendizaje Supervisado en Machine Learning",
+      "content": "El aprendizaje supervisado es un paradigma de machine learning donde el modelo aprende de datos etiquetados.\n\nCaracterísticas principales:\n- Dataset de entrenamiento con ejemplos entrada-salida\n- Objetivo: mapear entradas a salidas correctas\n- Evaluación con métricas específicas\n\nTipos de problemas:\n1. Clasificación: Predecir categorías discretas\n   - Binaria: dos clases (spam/no spam)\n   - Multiclase: múltiples categorías\n   - Algoritmos: SVM, Random Forest, Naive Bayes\n\n2. Regresión: Predecir valores continuos\n   - Predicción de precios, temperaturas, etc.\n   - Algoritmos: Regresión Lineal, Polynomial, Ridge\n\nProceso típico:\n1. Recolección y limpieza de datos\n2. División en conjuntos train/validation/test\n3. Entrenamiento del modelo\n4. Evaluación y ajuste de hiperparámetros\n5. Despliegue en producción\n\nMétricas de evaluación:\n- Clasificación: Accuracy, Precision, Recall, F1-Score\n- Regresión: MAE, MSE, RMSE, R²",
+      "author": "ML Engineering Team",
+      "tags": ["machine-learning", "supervised-learning", "classification", "regression"],
+      "metadata": {
+        "difficulty": "intermediate",
+        "reading_time": "8 minutes",
+        "prerequisites": ["basic-statistics", "python"]
+      }
+    },
+    {
+      "id": "doc_python_003",
+      "uri": "kb://programming/python-data-science.md", 
+      "title": "Python para Ciencia de Datos",
+      "content": "Python se ha consolidado como el lenguaje preferido para ciencia de datos debido a su simplicidad y ecosistema robusto.\n\nBibliotecas fundamentales:\n\n1. NumPy - Computación numérica\n   - Arrays multidimensionales eficientes\n   - Operaciones vectorizadas\n   - Álgebra lineal básica\n   - Base para todo el ecosistema científico\n\n2. Pandas - Manipulación de datos\n   - DataFrames y Series\n   - Lectura/escritura de múltiples formatos\n   - Operaciones de limpieza y transformación\n   - Análisis exploratorio de datos (EDA)\n\n3. Matplotlib/Seaborn - Visualización\n   - Gráficos estáticos de alta calidad\n   - Personalización avanzada\n   - Visualizaciones estadísticas especializadas\n\n4. Scikit-learn - Machine Learning\n   - Algoritmos de clasificación y regresión\n   - Clustering y reducción de dimensionalidad\n   - Herramientas de preprocesamiento\n   - Pipeline completo de ML\n\n5. Jupyter Notebooks\n   - Entorno interactivo\n   - Combinación de código, visualizaciones y texto\n   - Ideal para exploración y prototipado\n\nFlujo típico de trabajo:\n1. Importación y exploración de datos\n2. Limpieza y preprocesamiento\n3. Análisis exploratorio\n4. Modelado y evaluación\n5. Comunicación de resultados",
+      "author": "Data Science Team",
+      "tags": ["python", "data-science", "numpy", "pandas", "visualization"],
+      "metadata": {
+        "difficulty": "beginner",
+        "reading_time": "10 minutes",
+        "hands_on": true
+      }
+    },
+    {
+      "id": "doc_rag_004",
+      "uri": "kb://nlp/retrieval-augmented-generation.md",
+      "title": "RAG: Retrieval-Augmented Generation",
+      "content": "RAG es una arquitectura que combina la recuperación de información con la generación de texto para crear respuestas más precisas y actualizadas.\n\nComponentes del pipeline RAG:\n\n1. Document Store\n   - Base de datos de documentos fuente\n   - Indexación para búsqueda eficiente\n   - Metadatos para filtrado\n\n2. Retriever\n   - Búsqueda de documentos relevantes\n   - Algoritmos: TF-IDF, BM25, embeddings densos\n   - Índices optimizados para velocidad\n\n3. Ranker (opcional)\n   - Re-ordenamiento por relevancia\n   - Técnicas como MMR para diversidad\n   - Filtros por calidad y frescura\n\n4. Generator\n   - LLM que produce la respuesta final\n   - Prompt engineering crítico\n   - Gestión de contexto limitado\n\nVentajas de RAG:\n- Información actualizada sin reentrenamiento\n- Respuestas con fuentes verificables\n- Reduce alucinaciones del modelo\n- Escalable a grandes bases de conocimiento\n\nDesafíos comunes:\n- Calidad del retrieval impacta resultado final\n- Latencia adicional por búsqueda\n- Manejo de contexto conflictivo\n- Evaluación de calidad end-to-end\n\nVariantes avanzadas:\n- RAG híbrido (sparse + dense)\n- RAG conversacional con memoria\n- RAG con graph databases\n- Self-RAG con auto-reflexión",
+      "author": "NLP Research Team",
+      "tags": ["rag", "nlp", "information-retrieval", "llm", "generation"],
+      "metadata": {
+        "difficulty": "intermediate",
+        "reading_time": "12 minutes",
+        "related_papers": ["RAG-original-paper", "Dense-Passage-Retrieval"]
+      }
+    },
+    {
+      "id": "doc_api_005",
+      "uri": "kb://web-dev/rest-api-design.md",
+      "title": "Diseño de APIs REST: Mejores Prácticas", 
+      "content": "El diseño efectivo de APIs REST es fundamental para crear sistemas escalables y mantenibles.\n\nPrincipios REST:\n1. Stateless: Cada request contiene toda la información necesaria\n2. Client-Server: Separación clara de responsabilidades\n3. Cacheable: Respuestas deben indicar si son cacheables\n4. Uniform Interface: Interfaz consistente y predecible\n5. Layered System: Arquitectura en capas transparente\n\nDiseño de URLs:\n- Usar sustantivos para recursos: /users, /orders\n- Jerarquías claras: /users/123/orders/456\n- Evitar verbos en URLs\n- Parámetros query para filtros: ?status=active&limit=10\n\nMétodos HTTP:\n- GET: Obtener recursos (idempotente)\n- POST: Crear nuevos recursos\n- PUT: Actualizar recurso completo (idempotente)\n- PATCH: Actualización parcial\n- DELETE: Eliminar recurso (idempotente)\n\nCódigos de respuesta:\n- 200 OK: Operación exitosa\n- 201 Created: Recurso creado\n- 400 Bad Request: Error en el request\n- 401 Unauthorized: Autenticación requerida\n- 404 Not Found: Recurso no encontrado\n- 500 Internal Server Error: Error del servidor\n\nSeguridad:\n- HTTPS obligatorio en producción\n- Autenticación JWT o OAuth2\n- Validación estricta de entrada\n- Rate limiting para prevenir abuso\n- CORS configurado apropiadamente\n\nDocumentación:\n- OpenAPI/Swagger specification\n- Ejemplos de requests/responses\n- Códigos de error detallados\n- Guías de autenticación",
+      "author": "API Design Team",
+      "tags": ["api", "rest", "web-development", "http", "security"],
+      "metadata": {
+        "difficulty": "intermediate", 
+        "reading_time": "15 minutes",
+        "practical_examples": true
+      }
+    },
+    {
+      "id": "doc_db_006",
+      "uri": "kb://databases/vector-databases.md",
+      "title": "Bases de Datos Vectoriales para IA",
+      "content": "Las bases de datos vectoriales son infraestructura crítica para aplicaciones de IA que manejan embeddings y búsqueda semántica.\n\n¿Qué son los embeddings?\n- Representaciones numéricas densas de datos (texto, imágenes, audio)\n- Vectores de alta dimensionalidad (384, 768, 1536+)\n- Capturan similitud semántica en el espacio vectorial\n- Generados por modelos de ML entrenados\n\nOperaciones principales:\n1. Indexación: Almacenar vectores con metadata\n2. Búsqueda: Encontrar vectores similares (k-NN)\n3. Filtrado: Combinar búsqueda vectorial con filtros\n4. Actualización: Modificar vectores y reconstruir índices\n\nMétricas de similitud:\n- Cosine Similarity: Angle entre vectores\n- Euclidean Distance: Distancia geométrica\n- Dot Product: Producto punto\n- Manhattan Distance: Suma de diferencias absolutas\n\nAlgoritmos de indexación:\n- HNSW (Hierarchical NSW): Balance velocidad/precisión\n- IVF (Inverted File): Clustering para grandes datasets\n- LSH (Locality Sensitive Hashing): Aproximación rápida\n- Product Quantization: Compresión de vectores\n\nBases de datos populares:\n1. Pinecone: Managed service, fácil de usar\n2. Weaviate: Open source, GraphQL API\n3. Qdrant: Rust-based, alta performance\n4. Chroma: Lightweight, embeddings integrados\n5. Milvus: Enterprise-grade, horizontal scaling\n\nCasos de uso:\n- Búsqueda semántica en documentos\n- Sistemas de recomendación\n- RAG (Retrieval-Augmented Generation)\n- Detección de duplicados\n- Análisis de similitud multimedia\n\nConsideraciones de performance:\n- Trade-off precisión vs velocidad\n- Memoria RAM vs tamaño del dataset\n- Latencia de consulta vs throughput\n- Consistencia en escrituras distribuidas",
+      "author": "Database Engineering Team",
+      "tags": ["vector-database", "embeddings", "similarity-search", "indexing", "performance"],
+      "metadata": {
+        "difficulty": "advanced",
+        "reading_time": "18 minutes",
+        "technical_depth": "high"
+      }
+    },
+    {
+      "id": "doc_eval_007",
+      "uri": "kb://evaluation/ml-model-evaluation.md",
+      "title": "Evaluación de Modelos de Machine Learning",
+      "content": "La evaluación rigurosa de modelos de ML es crucial para asegurar performance en producción.\n\nTipos de evaluación:\n\n1. Offline Evaluation\n   - Test sets holdout\n   - Cross-validation\n   - Time series splits para datos temporales\n   - Métricas automatizadas\n\n2. Online Evaluation\n   - A/B testing\n   - Canary deployments\n   - Métricas de negocio\n   - Feedback loops\n\nMétricas por tipo de problema:\n\nClasificación:\n- Accuracy: Correctos / Total\n- Precision: TP / (TP + FP)\n- Recall: TP / (TP + FN) \n- F1-Score: Media armónica de precision y recall\n- AUC-ROC: Área bajo curva ROC\n- Confusion Matrix: Matriz de confusión\n\nRegresión:\n- MAE: Mean Absolute Error\n- MSE: Mean Squared Error\n- RMSE: Root Mean Squared Error\n- R²: Coeficiente de determinación\n- MAPE: Mean Absolute Percentage Error\n\nSistemas de ranking:\n- NDCG: Normalized Discounted Cumulative Gain\n- MAP: Mean Average Precision\n- MRR: Mean Reciprocal Rank\n- Precision@K: Precisión en top-K resultados\n\nEvaluación de LLMs:\n- BLEU: Overlap de n-gramas\n- ROUGE: Recall-oriented understudy\n- BERTScore: Similaridad semántica\n- Human evaluation: Ratings humanos\n- Task-specific metrics\n\nBuenas prácticas:\n- Separación temporal para datos time-series\n- Stratified sampling para clases desbalanceadas\n- Multiple random seeds para reproducibilidad\n- Statistical significance testing\n- Monitoring continuo en producción\n\nEvaluación de RAG:\n- Relevancia del retrieval\n- Fidelidad de la generación\n- Completitud de la respuesta\n- Citation accuracy",
+      "author": "ML Ops Team",
+      "tags": ["evaluation", "metrics", "machine-learning", "testing", "validation"],
+      "metadata": {
+        "difficulty": "intermediate",
+        "reading_time": "14 minutes",
+        "practical_focus": true
+      }
+    },
+    {
+      "id": "doc_prod_008",
+      "uri": "kb://deployment/ml-production.md",
+      "title": "Despliegue de ML en Producción",
+      "content": "Llevar modelos de ML a producción requiere consideraciones adicionales más allá del desarrollo del modelo.\n\nArquitectura de despliegue:\n\n1. Batch Prediction\n   - Predicciones programadas\n   - Procesamiento de grandes volúmenes\n   - Latencia no crítica\n   - Cron jobs o schedulers\n\n2. Real-time Serving\n   - APIs REST/gRPC\n   - Latencia baja (<100ms)\n   - Escalabilidad horizontal\n   - Load balancing\n\n3. Streaming\n   - Kafka, Kinesis, Pub/Sub\n   - Procesamiento continuo\n   - Apache Spark, Flink\n   - Event-driven architecture\n\nContainerización:\n- Docker para reproducibilidad\n- Multi-stage builds para optimización\n- Base images específicas (Python slim)\n- Security scanning\n\nOrquestación:\n- Kubernetes para scaling\n- Helm charts para deployment\n- Resource limits y requests\n- Health checks y readiness probes\n\nMonitoreo en producción:\n- Model performance metrics\n- Data drift detection\n- Concept drift monitoring\n- Infrastructure metrics (CPU, memory)\n- Business KPIs\n\nML Ops pipeline:\n1. Data validation\n2. Model training automation\n3. Model validation gates\n4. Deployment automation\n5. Monitoring y alerting\n6. Rollback procedures\n\nA/B Testing:\n- Traffic splitting\n- Statistical significance\n- Guardrails y safety checks\n- Gradual rollouts\n\nSecurity considerations:\n- Model versioning\n- Access controls\n- Data encryption\n- Audit logs\n- PII handling\n\nHerramientas populares:\n- MLflow: Experiment tracking\n- Kubeflow: ML workflows en K8s\n- Seldon: Model serving\n- BentoML: Model packaging\n- Weights & Biases: Experiment management",
+      "author": "ML Platform Team",
+      "tags": ["production", "deployment", "mlops", "monitoring", "scaling"],
+      "metadata": {
+        "difficulty": "advanced",
+        "reading_time": "20 minutes",
+        "enterprise_focus": true
+      }
+    }
+  ]
+}
