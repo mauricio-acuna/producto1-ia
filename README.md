@@ -1,6 +1,26 @@
-# Portal 1: Fundamentos de IA para Desarrolladores
+# 🤖 Portal 1: Fundamentos de IA para Desarrolladores
 
 Este repositorio contiene el desarrollo del **Portal 1**, un curso de capacitación en IA diseñado específicamente para desarrolladores sin experiencia previa en agentes o RAG.
+
+## 📋 **Tabla de Contenidos**
+- [🎯 Objetivo](#-objetivo)
+- [📚 Estructura del Curso](#-estructura-del-curso)
+- [🏗️ Arquitectura del Proyecto](#️-arquitectura-del-proyecto)
+- [🚀 Inicio Rápido](#-inicio-rápido)
+- [🧪 Laboratorios Disponibles](#-laboratorios-disponibles)
+- [📋 Estado del Desarrollo](#-estado-del-desarrollo)
+- [📊 Métricas del Proyecto](#-métricas-del-proyecto)
+- [🛠️ Tecnologías Utilizadas](#️-tecnologías-utilizadas)
+- [📚 Documentación Adicional](#-documentación-adicional)
+- [🤝 Contribución](#-contribución)
+
+## 📋 **Navegación Rápida**
+
+| 📚 **Documentación** | 🔧 **Desarrollo** | 🎯 **Laboratorios** |
+|---------------------|-------------------|---------------------|
+| [📖 PRD Completo](./PRD.md) | [🚀 Guía de Despliegue](docs/deployment/guia-despliegue-produccion.md) | [🧪 Labs Módulo A](labs/module-a/) |
+| [⚡ Benchmarks](docs/performance/marco-benchmarks-rendimiento.md) | [🔌 API Docs](docs/api/README.md) | [🏗️ Arquitectura](docs/adr/README-ES.md) |
+| [🔒 Seguridad](docs/security/marco-seguridad-etica.md) | [📊 Análisis Industrial](analysis/documentation_standards_assessment.md) | [📁 Código Fuente](src/) |
 
 ## 🎯 Objetivo
 
@@ -13,11 +33,13 @@ Proporcionar una ruta clara y modular para que desarrolladores junior/mid-level 
 
 ## 📚 Estructura del Curso
 
-- **Módulo A**: Conceptos esenciales (agentes vs chat, JSON estructurado) ✅
-- **Módulo B**: Primer mini-agente (Planner→Executor→Critic)
-- **Módulo C**: RAG básico con citas canónicas  
-- **Módulo D**: Métricas de calidad, coste y latencia
-- **Módulo E**: Capstone final (proyecto integrador)
+| Módulo | Estado | Descripción | Enlaces |
+|--------|---------|-------------|---------|
+| **A** | ✅ Completo | Conceptos esenciales | [📁 Contenido](content/modules/module-a-conceptos/) \| [🧪 Labs](labs/module-a/) |
+| **B** | 🚧 En desarrollo | Primer mini-agente | [📁 Contenido](content/modules/module-b-mini-agente/) |
+| **C** | ⏳ Pendiente | RAG básico con citas | [📁 Contenido](content/modules/module-c-rag-basico/) |
+| **D** | ⏳ Pendiente | Métricas de calidad | [📁 Contenido](content/modules/module-d-metricas/) |
+| **E** | ⏳ Pendiente | Capstone final | [📁 Contenido](content/modules/module-e-capstone/) |
 
 ## 🏗️ Arquitectura del Proyecto
 
@@ -61,7 +83,7 @@ producto1/
 
 ## 🚀 Inicio Rápido
 
-### Opción 1: Docker (Recomendado)
+### 🐳 Opción 1: Docker (Recomendado)
 ```bash
 # Clonar repositorio
 git clone https://github.com/mauricio-acuna/producto1-ia.git
@@ -76,7 +98,7 @@ docker-compose up --build
 # - Jupyter: http://localhost:8888 (opcional)
 ```
 
-### Opción 2: Local
+### 🐍 Opción 2: Local
 ```bash
 # Crear entorno virtual
 python -m venv venv
@@ -90,6 +112,23 @@ pip install -r requirements.txt
 # Ejecutar aplicación
 cd src
 python main.py
+```
+
+## 🧪 Laboratorios Disponibles
+
+### 📘 Módulo A: Conceptos Esenciales
+| Lab | Descripción | Archivo | Estado |
+|-----|-------------|---------|---------|
+| 1 | Chat vs Agente | [chat_vs_agent.py](labs/module-a/chat_vs_agent.py) | ✅ |
+| 2 | JSON estructurado | [structured_output.py](labs/module-a/structured_output.py) | ✅ |
+| 3 | Validación seguridad | [security_validator.py](labs/module-a/security_validator.py) | ✅ |
+
+```bash
+# Ejecutar laboratorios
+cd labs/module-a
+python chat_vs_agent.py        # Lab 1
+python structured_output.py    # Lab 2  
+python security_validator.py   # Lab 3
 ```
 
 ## 📋 Estado del Desarrollo
@@ -162,10 +201,21 @@ python security_validator.py
 
 ## 📚 Documentación Adicional
 
-- [PRD.md](./PRD.md) - Documento de Requerimientos del Producto
-- [project.config.json](./project.config.json) - Configuración del curso
-- [Plantillas](./templates/) - Recursos descargables para estudiantes
-- [API Docs](http://localhost:8000/api/docs) - Documentación interactiva
+### 📋 **Documentos Principales**
+- [📄 PRD.md](./PRD.md) - Documento de Requerimientos del Producto
+- [⚙️ project.config.json](./project.config.json) - Configuración del curso
+- [📁 Plantillas](./templates/) - Recursos descargables para estudiantes
+
+### 🏗️ **Arquitectura y Desarrollo**
+- [🏛️ ADRs (Decisiones Arquitectónicas)](docs/adr/README-ES.md)
+- [🔌 Documentación API Completa](docs/api/README.md)
+- [🚀 Guías de Despliegue](docs/deployment/guia-despliegue-produccion.md)
+- [⚡ Benchmarks de Rendimiento](docs/performance/marco-benchmarks-rendimiento.md)
+- [🔒 Marco de Seguridad y Ética](docs/security/marco-seguridad-etica.md)
+
+### 📊 **Análisis y Estándares**
+- [🏭 Análisis de Estándares Industriales](analysis/documentation_standards_assessment.md)
+- [📋 README Industrial](README_INDUSTRY_STANDARD.md)
 
 ## 🤝 Contribución
 
