@@ -36,10 +36,10 @@ Proporcionar una ruta clara y modular para que desarrolladores junior/mid-level 
 | Módulo | Estado | Descripción | Enlaces |
 |--------|---------|-------------|---------|
 | **A** | ✅ Completo | Conceptos esenciales | [📁 Contenido](content/modules/module-a-conceptos/) \| [🧪 Labs](labs/module-a/) |
-| **B** | 🚧 En desarrollo | Primer mini-agente | [📁 Contenido](content/modules/module-b-mini-agente/) |
-| **C** | ⏳ Pendiente | RAG básico con citas | [📁 Contenido](content/modules/module-c-rag-basico/) |
-| **D** | ⏳ Pendiente | Métricas de calidad | [📁 Contenido](content/modules/module-d-metricas/) |
-| **E** | ⏳ Pendiente | Capstone final | [📁 Contenido](content/modules/module-e-capstone/) |
+| **B** | ✅ Completo | Primer mini-agente (PEC) | [📁 Contenido](content/modules/module-b-mini-agente/) |
+| **C** | ✅ Completo | RAG básico con citas | [📁 Contenido](content/modules/module-c-rag-basico/) |
+| **D** | ✅ Completo | Métricas de calidad | [📁 Contenido](content/modules/module-d-metricas/) |
+| **E** | ✅ Completo | Capstone final | [📁 Contenido](content/modules/module-e-capstone/) |
 
 ## 🏗️ Arquitectura del Proyecto
 
@@ -123,8 +123,16 @@ python main.py
 | 2 | JSON estructurado | [structured_output.py](labs/module-a/structured_output.py) | ✅ |
 | 3 | Validación seguridad | [security_validator.py](labs/module-a/security_validator.py) | ✅ |
 
+### 📗 Módulos B-E: Contenido Teórico Completo
+| Módulo | Contenido | Estado | Laboratorios |
+|--------|-----------|---------|--------------|
+| B | [Mini-agente PEC](content/modules/module-b-mini-agente/) | ✅ | 🚧 Pendiente |
+| C | [RAG con citas](content/modules/module-c-rag-basico/) | ✅ | 🚧 Pendiente |
+| D | [Métricas](content/modules/module-d-metricas/) | ✅ | 🚧 Pendiente |
+| E | [Capstone](content/modules/module-e-capstone/) | ✅ | 🚧 Pendiente |
+
 ```bash
-# Ejecutar laboratorios
+# Ejecutar laboratorios disponibles
 cd labs/module-a
 python chat_vs_agent.py        # Lab 1
 python structured_output.py    # Lab 2  
@@ -137,20 +145,22 @@ python security_validator.py   # Lab 3
 - [x] **PRD inicial** - Documento completo de requerimientos
 - [x] **Estructura del proyecto** - Arquitectura modular establecida
 - [x] **Módulo A completo** - Conceptos esenciales con 3 laboratorios
+- [x] **Módulo B completo** - Mini-agente con patrón PEC (Planner-Executor-Critic)
+- [x] **Módulo C completo** - RAG básico con citas canónicas
+- [x] **Módulo D completo** - Métricas de calidad, coste y latencia
+- [x] **Módulo E completo** - Capstone final
 - [x] **API REST** - Endpoints para módulos, progreso y autenticación
 - [x] **Base de datos** - Modelo SQLite para usuarios y progreso
 - [x] **Containerización** - Docker y docker-compose configurados
 - [x] **Landing page** - Portal web con información del curso
+- [x] **Documentación Industrial** - Framework de nivel empresarial
 
 ### 🚧 En Desarrollo
-- [ ] **Módulo B** - Primer mini-agente (Planner→Executor→Critic)
+- [ ] **Laboratorios Módulos B-E** - Implementación práctica de laboratorios
 - [ ] **Sistema de evaluación** - Quizzes y validación automática
 - [ ] **Dashboard de progreso** - Interfaz para tracking de estudiantes
 
-### ⏳ Pendiente
-- [ ] **Módulo C** - RAG básico con citas canónicas
-- [ ] **Módulo D** - Métricas de calidad, coste y latencia  
-- [ ] **Módulo E** - Capstone final
+### ⏳ Siguiente Fase
 - [ ] **Frontend completo** - Interfaz web para estudiantes
 - [ ] **Sistema de certificados** - Generación automática
 - [ ] **Analytics avanzado** - Métricas detalladas del curso
@@ -174,11 +184,12 @@ python security_validator.py
 
 ## 📊 Métricas del Proyecto
 
-- **Líneas de código**: ~2,500+ (Python, Markdown, configs)
-- **Módulos educativos**: 1/5 completos
-- **Laboratorios prácticos**: 3 implementados
+- **Líneas de código**: ~20,000+ (Python, Markdown, configs)
+- **Módulos educativos**: 5/5 completos (contenido teórico)
+- **Laboratorios prácticos**: 3/15 implementados
 - **Endpoints API**: 15+ funcionales
 - **Documentos de conocimiento**: 10 (dataset RAG)
+- **Documentación técnica**: Nivel industrial completo
 
 ## 🛠️ Tecnologías Utilizadas
 
